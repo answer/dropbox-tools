@@ -1,0 +1,9 @@
+= dropbox-tools
+
+dropbox 関連のスクリプト
+
+
+== dropboxd.init
+
+* dropboxd.init start : $dropbox_dist_path/dropboxd デーモンを起動
+* dropboxd.init stop : $dropbox_dist_path/dropboxd デーモンを停止
