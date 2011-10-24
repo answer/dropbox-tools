@@ -1,0 +1,90 @@
+#!/bin/bash
+
+[ -f ~/.dropboxd.rc ] && . ~/.dropboxd.rc
+
+if [ -z "$dropbox_dist_path" ]; then
+	dropbox_dist_path=~/.dropbox-dist
+fi
+if [ -z "$pid_file" ]; then
+	pid_file=~/.dropbox-tools/pid
+fi
+mkdir -p `dirname "$pid_file"`
+
+DAEMON=$dropbox_dist_path/dropbox
+NAME=`basename "$DAEMON"`
+unset DISPLAY
+
+start() {
+	echo "Starting dropbox..."
+	if [ -x "$DAEMON" ]; then
+		start-stop-daemon -b -o -S -m -x "$DAEMON" -p "$pid_file" -u "$USER"
+	else
+		echo "$DAEMON is not executable"
+	fi
+}
+
+stop() {
+	echo "Stopping dropbox..."
+	if [ -x "$DAEMON" ]; then
+		start-stop-daemon -o -K -x "$DAEMON" -p "$pid_file" -u "$USER"
+	else
+		echo "$DAEMON is not executable"
+	fi
+}
+
+status() {
+	if [ ! -f "$pid_file" ]; then
+		check_status
+	else
+		pid=`cat "$pid_file"`
+		dropbox_pid=`pgrep -u "$USER" "$NAME" | grep "$pid"`
+		if [ -z "$dropbox_pid" ] ; then
+			check_status
+		else
+			echo "dropboxd : running (pid $dropbox_pid)"
+		fi
+	fi
+}
+check_status() {
+	self=`basename "$0"`
+	dropbox_pid=`pgrep -u "$USER" "$NAME" -l | grep -v "$self"`
+	if [ -z "$dropbox_pid" ] ; then
+		echo "dropboxd : not running."
+	else
+		echo "dropboxd : seems to be running (pid $dropbox_pid)"
+	fi
+}
+
+
+case "$1" in
+	start)
+		start
+		sleep 1
+		status
+		;;
+
+	stop)
+		stop
+		sleep 1
+		status
+		;;
+
+	status)
+		status
+		;;
+
+	restart|reload|force-reload)
+		stop
+		sleep 1
+		start
+		sleep 1
+		status
+		;;
+
+	*)
+		echo "Usage: init/dropboxd {start|stop|status|restart|reload|force-reload}"
+		exit 1
+
+esac
+
+exit 0
