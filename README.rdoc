@@ -5,5 +5,18 @@ dropbox 関連のスクリプト
 
 == dropboxd.init
 
-* dropboxd.init start : $dropbox_dist_path/dropboxd デーモンを起動
-* dropboxd.init stop : $dropbox_dist_path/dropboxd デーモンを停止
+* dropboxd.init start : dropboxd デーモンを起動
+* dropboxd.init stop : dropboxd デーモンを停止
+* dropboxd.init status : dropboxd デーモンの状態を表示
+* dropboxd.init <restart|reload|force-reload> : stop してから start
+
+=== 設定
+
+* ~/.dropboxd.rc
+  * dropbox_dist_path : .dropbox-dist のインストールパス (default: ~/.dropbox-dist)
+  * pid_file : pid ファイルパス (default: ~/.dropbox-tools/pid)
+
+=== 作成れるファイル
+
+* $pid_file : pid ファイル(親ディレクトリも作成される)
+
